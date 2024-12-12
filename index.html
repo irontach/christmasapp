@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santa Flappy Bird</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background-color: #87CEEB;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background: url('https://i.imgur.com/3z3gklk.png') repeat-x; /* Snowy background */
+            background-size: cover;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const santa = new Image();
+        santa.src = "https://i.imgur.com/Zn2zvDy.png"; // Santa sprite
+
+        const pipeTop = new Image();
+        pipeTop.src = "https://i.imgur.com/OFOZSdX.png"; // Top pipe
+
+        const pipeBottom = new Image();
+        pipeBottom.src = "https://i.imgur.com/6Y77TpJ.png"; // Bottom pipe
+
+        let santaX = 50;
+        let santaY = canvas.height / 2;
+        const gravity = 2;
+        const lift = -30;
+        let velocity = 0;
+
+        const pipes = [];
+        const pipeWidth = 80;
+        const gap = 200;
+        let frame = 0;
+
+        let score = 0;
+
+        function drawSanta() {
+            ctx.drawImage(santa, santaX, santaY, 50, 50);
+        }
+
+        function drawPipes() {
+            for (let i = 0; i < pipes.length; i++) {
+                const pipe = pipes[i];
+                ctx.drawImage(pipeTop, pipe.x, pipe.y, pipeWidth, pipe.topHeight);
+                ctx.drawImage(pipeBottom, pipe.x, pipe.y + pipe.topHeight + gap, pipeWidth, canvas.height - pipe.topHeight - gap);
+            }
+        }
+
+        function updatePipes() {
+            for (let i = 0; i < pipes.length; i++) {
+                pipes[i].x -= 5;
+                if (pipes[i].x + pipeWidth < 0) {
+                    pipes.splice(i, 1);
+                    score++;
+                }
+            }
+
+            if (frame % 100 === 0) {
+                const topHeight = Math.random() * (canvas.height / 2 - 50) + 50;
+                pipes.push({ x: canvas.width, y: 0, topHeight });
+            }
+        }
+
+        function detectCollision() {
+            for (let i = 0; i < pipes.length; i++) {
+                const pipe = pipes[i];
+                const inPipeX = santaX + 50 > pipe.x && santaX < pipe.x + pipeWidth;
+                const inPipeY = santaY < pipe.topHeight || santaY + 50 > pipe.topHeight + gap;
+                if (inPipeX && inPipeY) {
+                    return true;
+                }
+            }
+            return santaY + 50 >= canvas.height;
+        }
+
+        function drawScore() {
+            ctx.font = "30px Arial";
+            ctx.fillStyle = "#fff";
+            ctx.fillText(`Score: ${score}`, 20, 40);
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawSanta();
+            drawPipes();
+            drawScore();
+
+            updatePipes();
+
+            velocity += gravity;
+            santaY += velocity;
+
+            if (detectCollision()) {
+                alert("Game Over! Your score is: " + score);
+                document.location.reload();
+            }
+
+            frame++;
+            requestAnimationFrame(gameLoop);
+        }
+
+        window.addEventListener("keydown", () => {
+            velocity = lift;
+        });
+
+        santa.onload = () => {
+            gameLoop();
+        };
+    </script>
+</body>
+</html>
