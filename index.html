@@ -14,8 +14,7 @@
         canvas {
             display: block;
             margin: 0 auto;
-            background: url('https://i.imgur.com/3z3gklk.png') repeat-x; /* Snowy background */
-            background-size: cover;
+            background-color: #fff; /* Snowy background */
         }
     </style>
 </head>
@@ -28,17 +27,9 @@
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        const santa = new Image();
-        santa.src = "https://i.imgur.com/Zn2zvDy.png"; // Santa sprite
-
-        const pipeTop = new Image();
-        pipeTop.src = "https://i.imgur.com/OFOZSdX.png"; // Top pipe
-
-        const pipeBottom = new Image();
-        pipeBottom.src = "https://i.imgur.com/6Y77TpJ.png"; // Bottom pipe
-
         let santaX = 50;
         let santaY = canvas.height / 2;
+        const santaSize = 50;
         const gravity = 2;
         const lift = -30;
         let velocity = 0;
@@ -51,14 +42,16 @@
         let score = 0;
 
         function drawSanta() {
-            ctx.drawImage(santa, santaX, santaY, 50, 50);
+            ctx.fillStyle = "red";
+            ctx.fillRect(santaX, santaY, santaSize, santaSize);
         }
 
         function drawPipes() {
             for (let i = 0; i < pipes.length; i++) {
                 const pipe = pipes[i];
-                ctx.drawImage(pipeTop, pipe.x, pipe.y, pipeWidth, pipe.topHeight);
-                ctx.drawImage(pipeBottom, pipe.x, pipe.y + pipe.topHeight + gap, pipeWidth, canvas.height - pipe.topHeight - gap);
+                ctx.fillStyle = "green";
+                ctx.fillRect(pipe.x, pipe.y, pipeWidth, pipe.topHeight);
+                ctx.fillRect(pipe.x, pipe.y + pipe.topHeight + gap, pipeWidth, canvas.height - pipe.topHeight - gap);
             }
         }
 
@@ -80,18 +73,18 @@
         function detectCollision() {
             for (let i = 0; i < pipes.length; i++) {
                 const pipe = pipes[i];
-                const inPipeX = santaX + 50 > pipe.x && santaX < pipe.x + pipeWidth;
-                const inPipeY = santaY < pipe.topHeight || santaY + 50 > pipe.topHeight + gap;
+                const inPipeX = santaX + santaSize > pipe.x && santaX < pipe.x + pipeWidth;
+                const inPipeY = santaY < pipe.topHeight || santaY + santaSize > pipe.topHeight + gap;
                 if (inPipeX && inPipeY) {
                     return true;
                 }
             }
-            return santaY + 50 >= canvas.height;
+            return santaY + santaSize >= canvas.height;
         }
 
         function drawScore() {
             ctx.font = "30px Arial";
-            ctx.fillStyle = "#fff";
+            ctx.fillStyle = "#000";
             ctx.fillText(`Score: ${score}`, 20, 40);
         }
 
@@ -120,9 +113,8 @@
             velocity = lift;
         });
 
-        santa.onload = () => {
-            gameLoop();
-        };
+        gameLoop();
     </script>
 </body>
 </html>
+
