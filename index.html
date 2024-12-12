@@ -100,10 +100,7 @@
             velocity += gravity;
             santaY += velocity;
 
-            if (detectCollision()) {
-                alert("Game Over! Your score is: " + score);
-                document.location.reload();
-            }
+            
 
             frame++;
             requestAnimationFrame(gameLoop);
